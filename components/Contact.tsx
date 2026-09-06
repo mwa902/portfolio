@@ -2,48 +2,43 @@
 
 import { useEffect, useRef, useState } from "react";
 import { personal } from "@/lib/data";
-import {
-  Mail, Phone, MapPin, Github, Linkedin, Twitter,
-  Send, CheckCircle, AlertCircle,
-} from "lucide-react";
+import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 function useReveal(delay = 0) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.style.opacity = "0";
-    el.style.transform = "translateY(40px)";
-    el.style.transition = `opacity 0.8s ease ${delay}s, transform 0.8s ease ${delay}s`;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.style.opacity = "1";
-          el.style.transform = "translateY(0)";
-        }
-      },
-      { threshold: 0.15 }
+    el.style.transitionDelay = `${delay}s`;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { el.classList.add("visible"); io.disconnect(); } },
+      { threshold: 0.1 }
     );
-    observer.observe(el);
-    return () => observer.disconnect();
+    io.observe(el);
+    return () => io.disconnect();
   }, [delay]);
   return ref;
 }
 
 type Status = "idle" | "sending" | "success" | "error";
 
+const SOCIALS = [
+  { Icon: Github,   label: "GitHub",   href: personal.github,   hoverColor: "#e2e8f0" },
+  { Icon: Linkedin, label: "LinkedIn", href: personal.linkedin, hoverColor: "#0a66c2" },
+  { Icon: Twitter,  label: "Twitter",  href: personal.twitter,  hoverColor: "#1d9bf0" },
+];
+
 export default function Contact() {
   const leftRef  = useReveal(0);
-  const rightRef = useReveal(0.2);
+  const rightRef = useReveal(0.15);
 
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [form, setForm]     = useState({ name: "", email: "", subject: "", message: "" });
   const [status, setStatus] = useState<Status>("idle");
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => setForm({ ...form, [e.target.name]: e.target.value });
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
     try {
@@ -66,391 +61,149 @@ export default function Contact() {
     }
   };
 
-  const socialLinks = [
-    { icon: <Github size={20} />,   label: "GitHub",   href: personal.github,   color: "#f0f0f0" },
-    { icon: <Linkedin size={20} />, label: "LinkedIn", href: personal.linkedin, color: "#0a66c2" },
-    { icon: <Twitter size={20} />,  label: "Twitter",  href: personal.twitter,  color: "#1d9bf0" },
-  ];
-
-  const inputStyle: React.CSSProperties = {
-    width: "100%",
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(0,229,255,0.2)",
-    borderRadius: 10,
-    padding: "12px 16px",
-    color: "#f0f0f0",
-    fontSize: "0.95rem",
-    outline: "none",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-  };
-
   return (
-    <section
-      id="contact"
-      style={{
-        padding: "120px 0 80px",
-        position: "relative",
-        background:
-          "radial-gradient(ellipse at 50% 80%, rgba(124,58,237,0.1) 0%, transparent 60%)",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: 0, left: "10%", right: "10%",
-          height: 1,
-          background: "linear-gradient(90deg, transparent, rgba(0,229,255,0.3), transparent)",
-        }}
-      />
+    <section id="contact" className="section bg-contact">
+      <div className="section-divider" />
+      <div className="container">
 
-      <div className="max-w-7xl mx-auto px-6">
         {/* Heading */}
-        <div className="text-center mb-16">
-          <span
-            className="inline-block text-sm font-semibold tracking-widest mb-3 px-4 py-1 rounded-full"
-            style={{
-              color: "#00e5ff",
-              background: "rgba(0,229,255,0.08)",
-              border: "1px solid rgba(0,229,255,0.2)",
-              letterSpacing: "0.15em",
-            }}
-          >
-            LET&apos;S TALK
-          </span>
-          <h2 className="section-heading gradient-text">Get In Touch</h2>
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              maxWidth: 480,
-              margin: "1rem auto 0",
-              lineHeight: 1.7,
-            }}
-          >
-            Have a project in mind or want to collaborate? I&apos;d love to hear from you.
-            My inbox is always open.
+        <div className="text-center" style={{ marginBottom: "3.5rem" }}>
+          <span className="section-tag section-tag--cyan">LET&apos;S TALK</span>
+          <h2 className="section-title gradient-text">Get In Touch</h2>
+          <p className="section-subtitle">
+            Have a project in mind or want to collaborate? My inbox is always open.
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* LEFT – info + socials */}
-          <div ref={leftRef}>
-            <h3
-              style={{ fontSize: "1.5rem", fontWeight: 800, marginBottom: "1.5rem" }}
-            >
+        <div className="contact-grid">
+
+          {/* LEFT */}
+          <div ref={leftRef} className="reveal">
+            <h3 style={{ fontSize: "var(--text-2xl)", fontWeight: 800, marginBottom: "1rem", lineHeight: 1.3 }}>
               Let&apos;s build something{" "}
               <span className="gradient-text">amazing</span> together
             </h3>
-            <p
-              style={{
-                color: "var(--text-secondary)",
-                lineHeight: 1.75,
-                marginBottom: "2rem",
-              }}
-            >
-              I&apos;m currently available for freelance work and full-time opportunities.
-              Whether you have a question, a project idea, or just want to say hi —
-              feel free to reach out!
+            <p style={{ color: "var(--clr-muted)", lineHeight: 1.8, marginBottom: "2rem", fontSize: "var(--text-sm)" }}>
+              I&apos;m available for freelance projects and full-time roles.
+              Whether you have a question, an idea, or just want to say hi — feel free to reach out.
             </p>
 
-            {/* Contact info */}
-            <div className="flex flex-col gap-4 mb-8">
+            {/* Contact rows */}
+            <div style={{ marginBottom: "1.75rem" }}>
               {[
-                { icon: <Mail size={18} />,    label: "Email",    value: personal.email,    href: `mailto:${personal.email}` },
-                { icon: <Phone size={18} />,   label: "Phone",    value: personal.phone,    href: `tel:${personal.phone}` },
-                { icon: <MapPin size={18} />,  label: "Location", value: personal.location, href: "#" },
-              ].map(({ icon, label, value, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  className="flex items-center gap-4 p-4 rounded-xl"
-                  style={{
-                    background: "rgba(0,229,255,0.05)",
-                    border: "1px solid rgba(0,229,255,0.12)",
-                    transition: "all 0.2s",
-                    textDecoration: "none",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(0,229,255,0.1)";
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(0,229,255,0.4)";
-                    (e.currentTarget as HTMLElement).style.transform =
-                      "translateX(6px)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLElement).style.background =
-                      "rgba(0,229,255,0.05)";
-                    (e.currentTarget as HTMLElement).style.borderColor =
-                      "rgba(0,229,255,0.12)";
-                    (e.currentTarget as HTMLElement).style.transform =
-                      "translateX(0)";
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: "50%",
-                      background: "rgba(0,229,255,0.12)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#00e5ff",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {icon}
+                { Icon: Mail,   label: "Email",    value: personal.email,    href: `mailto:${personal.email}` },
+                { Icon: Phone,  label: "Phone",    value: personal.phone,    href: `tel:${personal.phone}`    },
+                { Icon: MapPin, label: "Location", value: personal.location, href: "#"                        },
+              ].map(({ Icon, label, value, href }) => (
+                <a key={label} href={href} className="contact-info-item">
+                  <div className="contact-icon">
+                    <Icon size={16} />
                   </div>
                   <div>
-                    <div
-                      style={{
-                        fontSize: "0.75rem",
-                        color: "var(--text-secondary)",
-                        marginBottom: 2,
-                      }}
-                    >
-                      {label}
-                    </div>
-                    <div style={{ fontWeight: 600, color: "#f0f0f0" }}>{value}</div>
+                    <div className="contact-info-label">{label}</div>
+                    <div className="contact-info-value">{value}</div>
                   </div>
                 </a>
               ))}
             </div>
 
-            {/* Social links */}
-            <div>
-              <p
-                style={{
-                  color: "var(--text-secondary)",
-                  fontSize: "0.85rem",
-                  marginBottom: "1rem",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Follow me
-              </p>
-              <div className="flex gap-4">
-                {socialLinks.map(({ icon, label, href, color }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
-                    style={{
-                      background: "rgba(255,255,255,0.05)",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      color: "var(--text-secondary)",
-                      transition: "all 0.2s",
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.color = color;
-                      (e.currentTarget as HTMLElement).style.borderColor = color + "60";
-                      (e.currentTarget as HTMLElement).style.background = color + "15";
-                      (e.currentTarget as HTMLElement).style.transform =
-                        "translateY(-3px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.color =
-                        "var(--text-secondary)";
-                      (e.currentTarget as HTMLElement).style.borderColor =
-                        "rgba(255,255,255,0.1)";
-                      (e.currentTarget as HTMLElement).style.background =
-                        "rgba(255,255,255,0.05)";
-                      (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                    }}
-                  >
-                    {icon} {label}
-                  </a>
-                ))}
-              </div>
+            {/* Socials */}
+            <p style={{ color: "var(--clr-muted)", fontSize: "var(--text-xs)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "0.875rem" }}>
+              Follow me
+            </p>
+            <div style={{ display: "flex", gap: "0.625rem", flexWrap: "wrap" }}>
+              {SOCIALS.map(({ Icon, label, href, hoverColor }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-btn"
+                  onMouseEnter={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.color       = hoverColor;
+                    el.style.borderColor = hoverColor + "55";
+                    el.style.background  = hoverColor + "18";
+                    el.style.transform   = "translateY(-3px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    const el = e.currentTarget as HTMLElement;
+                    el.style.color       = "var(--clr-muted)";
+                    el.style.borderColor = "rgba(255,255,255,0.08)";
+                    el.style.background  = "var(--clr-faint)";
+                    el.style.transform   = "translateY(0)";
+                  }}
+                >
+                  <Icon size={15} /> {label}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* RIGHT – contact form */}
-          <div ref={rightRef}>
-            <form
-              onSubmit={handleSubmit}
-              className="glass-card p-8"
-              style={{ position: "relative" }}
-            >
-              <div className="grid sm:grid-cols-2 gap-5 mb-5">
+          {/* RIGHT — form */}
+          <div ref={rightRef} className="reveal">
+            <form onSubmit={onSubmit} className="card" style={{ padding: "2rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
                 <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.82rem",
-                      color: "var(--text-secondary)",
-                      marginBottom: 6,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Wahad Ahmed"
-                    required
-                    style={inputStyle}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#00e5ff";
-                      e.target.style.boxShadow = "0 0 0 3px rgba(0,229,255,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "rgba(0,229,255,0.2)";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
+                  <label className="form-label">Your Name</label>
+                  <input className="form-input" name="name" value={form.name} onChange={onChange}
+                    placeholder="Wahad Ahmed" required />
                 </div>
                 <div>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.82rem",
-                      color: "var(--text-secondary)",
-                      marginBottom: 6,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleChange}
-                    placeholder="ahmed.wahad49@gmail.com"
-                    required
-                    style={inputStyle}
-                    onFocus={(e) => {
-                      e.target.style.borderColor = "#00e5ff";
-                      e.target.style.boxShadow = "0 0 0 3px rgba(0,229,255,0.1)";
-                    }}
-                    onBlur={(e) => {
-                      e.target.style.borderColor = "rgba(0,229,255,0.2)";
-                      e.target.style.boxShadow = "none";
-                    }}
-                  />
+                  <label className="form-label">Email Address</label>
+                  <input className="form-input" name="email" type="email" value={form.email} onChange={onChange}
+                    placeholder="ahmed.wahad49@gmail.com" required />
                 </div>
               </div>
 
-              <div className="mb-5">
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.82rem",
-                    color: "var(--text-secondary)",
-                    marginBottom: 6,
-                    fontWeight: 600,
-                  }}
-                >
-                  Subject
-                </label>
-                <input
-                  name="subject"
-                  value={form.subject}
-                  onChange={handleChange}
-                  placeholder="Project Collaboration"
-                  required
-                  style={inputStyle}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#00e5ff";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(0,229,255,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(0,229,255,0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
+              <div style={{ marginBottom: "1rem" }}>
+                <label className="form-label">Subject</label>
+                <input className="form-input" name="subject" value={form.subject} onChange={onChange}
+                  placeholder="Project Collaboration" required />
               </div>
 
-              <div className="mb-6">
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.82rem",
-                    color: "var(--text-secondary)",
-                    marginBottom: 6,
-                    fontWeight: 600,
-                  }}
-                >
-                  Message
-                </label>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label className="form-label">Message</label>
                 <textarea
+                  className="form-input"
                   name="message"
                   value={form.message}
-                  onChange={handleChange}
-                  placeholder="Tell me about your project or idea..."
+                  onChange={onChange}
+                  placeholder="Tell me about your project or idea…"
                   required
                   rows={5}
-                  style={{ ...inputStyle, resize: "vertical", minHeight: 120 }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "#00e5ff";
-                    e.target.style.boxShadow = "0 0 0 3px rgba(0,229,255,0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "rgba(0,229,255,0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
+                  style={{ resize: "vertical", minHeight: 120 }}
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={status === "sending" || status === "success"}
-                className="w-full btn-primary flex items-center justify-center gap-3 py-3 text-base"
-                style={{
-                  opacity: status === "sending" ? 0.8 : 1,
-                  cursor: status === "sending" ? "wait" : "pointer",
-                }}
+                className="btn btn-primary"
+                style={{ width: "100%", justifyContent: "center", padding: "0.8rem", fontSize: "var(--text-base)" }}
               >
                 {status === "sending" ? (
-                  <>
-                    <div
-                      style={{
-                        width: 18,
-                        height: 18,
-                        border: "2px solid rgba(255,255,255,0.3)",
-                        borderTopColor: "#fff",
-                        borderRadius: "50%",
-                        animation: "rotate-slow 0.7s linear infinite",
-                      }}
-                    />
-                    Sending...
-                  </>
+                  <><div className="spinner" /> Sending…</>
                 ) : status === "success" ? (
-                  <>
-                    <CheckCircle size={18} /> Message Sent!
-                  </>
+                  <><CheckCircle size={17} /> Sent Successfully!</>
                 ) : status === "error" ? (
-                  <>
-                    <AlertCircle size={18} /> Try Again
-                  </>
+                  <><AlertCircle size={17} /> Failed — Try Again</>
                 ) : (
-                  <>
-                    <Send size={18} /> Send Message
-                  </>
+                  <><Send size={17} /> Send Message</>
                 )}
               </button>
 
               {status === "success" && (
-                <div
-                  style={{
-                    marginTop: 16,
-                    padding: "12px 16px",
-                    borderRadius: 10,
-                    background: "rgba(16,185,129,0.1)",
-                    border: "1px solid rgba(16,185,129,0.3)",
-                    color: "#10b981",
-                    fontSize: "0.9rem",
-                    textAlign: "center",
-                  }}
-                >
-                  🎉 Thanks! I&apos;ll get back to you within 24 hours.
+                <div className="alert-success">
+                  🎉 Thanks! I&apos;ll reply within 24 hours.
+                </div>
+              )}
+              {status === "error" && (
+                <div className="alert-error">
+                  Something went wrong. Please email me directly at{" "}
+                  <a href="mailto:ahmed.wahad49@gmail.com" style={{ color: "inherit", textDecoration: "underline" }}>
+                    ahmed.wahad49@gmail.com
+                  </a>
                 </div>
               )}
             </form>

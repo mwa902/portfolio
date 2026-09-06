@@ -2,119 +2,91 @@
 
 import { useEffect, useRef, useState } from "react";
 import { orbitItems } from "@/lib/data";
-import { Github, Linkedin, Twitter, Download, ArrowRight } from "lucide-react";
+import { Github, Linkedin, Twitter, ArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
 
-/* ── Particle canvas ─────────────────────────────────────────── */
-function ParticleCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+/* ─── Particle background ──────────────────────────────────── */
+function Particles() {
+  const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
+    const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d")!;
-    let animId: number;
+    let raf: number;
 
     const resize = () => {
       canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
     };
     resize();
-    window.addEventListener("resize", resize);
+    window.addEventListener("resize", resize, { passive: true });
 
-    const particles = Array.from({ length: 80 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: Math.random() * 1.5 + 0.5,
-      dx: (Math.random() - 0.5) * 0.3,
-      dy: (Math.random() - 0.5) * 0.3,
-      alpha: Math.random() * 0.5 + 0.1,
+    const pts = Array.from({ length: 70 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.4 + 0.4,
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: (Math.random() - 0.5) * 0.28,
+      a: Math.random() * 0.45 + 0.08,
     }));
 
-    const draw = () => {
+    const tick = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p) => {
+      pts.forEach((p) => {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0,229,255,${p.alpha})`;
+        ctx.fillStyle = `rgba(0,229,255,${p.a})`;
         ctx.fill();
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0 || p.x > canvas.width)  p.dx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > canvas.width)  p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
       });
-      animId = requestAnimationFrame(draw);
+      raf = requestAnimationFrame(tick);
     };
-    draw();
+    tick();
+
     return () => {
-      cancelAnimationFrame(animId);
+      cancelAnimationFrame(raf);
       window.removeEventListener("resize", resize);
     };
   }, []);
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={ref}
       style={{
-        position: "fixed",
-        top: 0, left: 0,
+        position: "fixed", inset: 0,
         width: "100%", height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
+        pointerEvents: "none", zIndex: 0,
       }}
+      aria-hidden
     />
   );
 }
 
-/* ── Orbiting icon ──────────────────────────────────────────── */
-function OrbitItem({
-  icon, label, size, radius, speed, delay, index,
+/* ─── Orbiting icon ────────────────────────────────────────── */
+function OrbitIcon({
+  icon, label, size, radius, speed, delay,
 }: {
-  icon: string; label: string; size: number;
-  radius: number; speed: number; delay: number; index: number;
+  icon: string; label: string;
+  size: number; radius: number; speed: number; delay: number;
 }) {
+  const half = size / 2;
   return (
     <div
+      className="orbit-icon"
       style={{
-        position: "absolute",
-        width: size,
-        height: size,
+        width: size, height: size,
+        marginTop: -half, marginLeft: -half,
         animation: `orbit ${speed}s linear ${delay}s infinite`,
-        ["--radius" as string]: `${radius}px`,
-        transformOrigin: "0 0",
-        top: "50%",
-        left: "50%",
-        marginTop: -(size / 2),
-        marginLeft: -(size / 2),
-      }}
+        "--r": `${radius}px`,
+      } as React.CSSProperties}
     >
       <div
+        className="orbit-icon-inner"
+        style={{ width: size, height: size, fontSize: size * 0.42 }}
         title={label}
-        style={{
-          width: "100%",
-          height: "100%",
-          background: "rgba(0,229,255,0.08)",
-          border: "1px solid rgba(0,229,255,0.3)",
-          borderRadius: "50%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: size * 0.45,
-          backdropFilter: "blur(8px)",
-          cursor: "default",
-          boxShadow: "0 0 12px rgba(0,229,255,0.2)",
-          transition: "transform 0.2s, box-shadow 0.2s",
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.transform = "scale(1.2)";
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            "0 0 24px rgba(0,229,255,0.5)";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.transform = "scale(1)";
-          (e.currentTarget as HTMLElement).style.boxShadow =
-            "0 0 12px rgba(0,229,255,0.2)";
-        }}
       >
         {icon}
       </div>
@@ -122,114 +94,69 @@ function OrbitItem({
   );
 }
 
-/* ── Developer character (SVG) ──────────────────────────────── */
-function DevCharacter() {
+/* ─── Developer SVG character ──────────────────────────────── */
+function DevChar() {
   return (
-    <div
-      style={{ animation: "float 4s ease-in-out infinite" }}
-      className="relative"
-    >
-      {/* Glow base */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: -20,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 120,
-          height: 30,
-          background: "radial-gradient(ellipse, rgba(0,229,255,0.4) 0%, transparent 70%)",
-          filter: "blur(8px)",
-        }}
-      />
+    <div className="anim-float" style={{ position: "relative" }}>
+      <div className="char-glow" />
       <svg
-        width="200"
-        height="260"
-        viewBox="0 0 200 260"
+        viewBox="0 0 200 270"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        style={{ width: "100%", maxWidth: 220, display: "block", margin: "0 auto" }}
       >
-        {/* Body / hoodie */}
-        <rect x="55" y="120" width="90" height="90" rx="20" fill="#1a1a3e" />
-        <rect x="55" y="120" width="90" height="90" rx="20"
-          fill="url(#bodyGrad)" opacity="0.8" />
+        {/* Body */}
+        <rect x="54" y="118" width="92" height="92" rx="22" fill="#141430" />
+        <rect x="54" y="118" width="92" height="92" rx="22" fill="url(#bGrad)" opacity="0.9" />
         {/* Hood */}
-        <path d="M55 140 Q50 115 70 110 Q100 100 130 110 Q150 115 145 140 Z"
-          fill="#12122e" />
-        {/* Code text on hoodie */}
-        <text x="72" y="165" fill="#00e5ff" fontSize="10" fontFamily="monospace"
-          fontWeight="bold">
-          &lt;/&gt;
-        </text>
-        <text x="85" y="180" fill="rgba(0,229,255,0.5)" fontSize="7"
-          fontFamily="monospace">
-          code()
-        </text>
-        {/* Left arm */}
-        <rect x="30" y="125" width="28" height="14" rx="7" fill="#1a1a3e" />
-        <rect x="20" y="132" width="18" height="12" rx="6" fill="#f5c6a0" />
-        {/* Right arm */}
-        <rect x="142" y="125" width="28" height="14" rx="7" fill="#1a1a3e" />
-        <rect x="162" y="132" width="18" height="12" rx="6" fill="#f5c6a0" />
+        <path d="M54 140 Q48 112 70 108 Q100 98 130 108 Q152 112 146 140 Z" fill="#0e0e28" />
+        {/* Code on hoodie */}
+        <text x="71" y="162" fill="#00e5ff" fontSize="11" fontFamily="monospace" fontWeight="bold">&lt;/&gt;</text>
+        <text x="82" y="177" fill="rgba(0,229,255,0.45)" fontSize="7.5" fontFamily="monospace">wahad()</text>
+        {/* Arms */}
+        <rect x="28" y="124" width="29" height="15" rx="7.5" fill="#141430" />
+        <rect x="18" y="131" width="18" height="12" rx="6" fill="#f0b98a" />
+        <rect x="143" y="124" width="29" height="15" rx="7.5" fill="#141430" />
+        <rect x="164" y="131" width="18" height="12" rx="6" fill="#f0b98a" />
         {/* Legs */}
-        <rect x="68"  y="200" width="28" height="50" rx="12" fill="#12122e" />
-        <rect x="104" y="200" width="28" height="50" rx="12" fill="#12122e" />
+        <rect x="66"  y="200" width="30" height="52" rx="13" fill="#0e0e28" />
+        <rect x="104" y="200" width="30" height="52" rx="13" fill="#0e0e28" />
         {/* Shoes */}
-        <ellipse cx="82"  cy="250" rx="16" ry="8" fill="#00e5ff" opacity="0.9" />
-        <ellipse cx="118" cy="250" rx="16" ry="8" fill="#7c3aed" opacity="0.9" />
+        <ellipse cx="81"  cy="252" rx="17" ry="9" fill="#00e5ff" opacity="0.9" />
+        <ellipse cx="119" cy="252" rx="17" ry="9" fill="#7c3aed" opacity="0.9" />
         {/* Head */}
-        <ellipse cx="100" cy="90" rx="42" ry="44" fill="#f5c6a0" />
+        <ellipse cx="100" cy="88" rx="43" ry="45" fill="#f0b98a" />
         {/* Hair */}
-        <ellipse cx="100" cy="53" rx="42" ry="20" fill="#1a0a00" />
-        <rect x="58" y="53" width="84" height="15" rx="5" fill="#1a0a00" />
+        <ellipse cx="100" cy="50" rx="43" ry="22" fill="#150a00" />
+        <rect x="57" y="50" width="86" height="16" rx="5" fill="#150a00" />
         {/* Eyes */}
-        <ellipse cx="85"  cy="90" rx="6" ry="7" fill="white" />
-        <ellipse cx="115" cy="90" rx="6" ry="7" fill="white" />
-        <ellipse cx="86"  cy="91" rx="3.5" ry="4" fill="#1a1a3e" />
-        <ellipse cx="116" cy="91" rx="3.5" ry="4" fill="#1a1a3e" />
-        {/* Eye shine */}
-        <circle cx="88"  cy="89" r="1.2" fill="white" />
-        <circle cx="118" cy="89" r="1.2" fill="white" />
+        <ellipse cx="84"  cy="88" rx="6.5" ry="7.5" fill="#fff" />
+        <ellipse cx="116" cy="88" rx="6.5" ry="7.5" fill="#fff" />
+        <ellipse cx="85"  cy="89" rx="3.8" ry="4.2" fill="#141430" />
+        <ellipse cx="117" cy="89" rx="3.8" ry="4.2" fill="#141430" />
+        <circle cx="87"  cy="87" r="1.3" fill="#fff" />
+        <circle cx="119" cy="87" r="1.3" fill="#fff" />
         {/* Smile */}
-        <path d="M88 105 Q100 116 112 105" stroke="#c0724a" strokeWidth="2.5"
-          fill="none" strokeLinecap="round" />
-        {/* Laptop */}
-        <rect x="42" y="192" width="116" height="72" rx="8"
-          fill="#0d0d2b" stroke="rgba(0,229,255,0.4)" strokeWidth="1.5" />
-        <rect x="48" y="198" width="104" height="56" rx="4" fill="#0a0a1a" />
-        {/* Screen glow */}
-        <rect x="48" y="198" width="104" height="56" rx="4"
-          fill="url(#screenGrad)" opacity="0.4" />
-        {/* Code on screen */}
-        <text x="56" y="215" fill="#00e5ff" fontSize="7" fontFamily="monospace">
-          const wahad = {"{}"}
-        </text>
-        <text x="56" y="227" fill="#7c3aed" fontSize="7" fontFamily="monospace">
-          &nbsp;&nbsp;role: &apos;dev&apos;,
-        </text>
-        <text x="56" y="239" fill="#ec4899" fontSize="7" fontFamily="monospace">
-          &nbsp;&nbsp;city: &apos;lahore&apos;
-        </text>
-        <text x="56" y="251" fill="rgba(0,229,255,0.6)" fontSize="7" fontFamily="monospace">
-          {"};"}
-        </text>
-        {/* Laptop base */}
-        <rect x="30" y="262" width="140" height="8" rx="4"
-          fill="#0d0d2b" stroke="rgba(0,229,255,0.3)" strokeWidth="1" />
+        <path d="M87 104 Q100 116 113 104" stroke="#b8703a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         {/* Glasses */}
-        <rect x="76" y="84" width="18" height="13" rx="5"
-          fill="none" stroke="#00e5ff" strokeWidth="1.5" opacity="0.7" />
-        <rect x="106" y="84" width="18" height="13" rx="5"
-          fill="none" stroke="#00e5ff" strokeWidth="1.5" opacity="0.7" />
-        <line x1="94" y1="90" x2="106" y2="90"
-          stroke="#00e5ff" strokeWidth="1.5" opacity="0.7" />
-
+        <rect x="75" y="82" width="19" height="13" rx="5" fill="none" stroke="#00e5ff" strokeWidth="1.5" opacity="0.75" />
+        <rect x="106" y="82" width="19" height="13" rx="5" fill="none" stroke="#00e5ff" strokeWidth="1.5" opacity="0.75" />
+        <line x1="94" y1="88" x2="106" y2="88" stroke="#00e5ff" strokeWidth="1.5" opacity="0.75" />
+        {/* Laptop */}
+        <rect x="40" y="190" width="120" height="74" rx="9" fill="#0c0c26" stroke="rgba(0,229,255,0.38)" strokeWidth="1.5" />
+        <rect x="46" y="196" width="108" height="58" rx="5" fill="#070714" />
+        <rect x="46" y="196" width="108" height="58" rx="5" fill="url(#sGrad)" opacity="0.35" />
+        <text x="54" y="213" fill="#00e5ff" fontSize="7.5" fontFamily="monospace">const wahad = &#123;</text>
+        <text x="54" y="225" fill="#7c3aed" fontSize="7.5" fontFamily="monospace">  role: &apos;dev&apos;,</text>
+        <text x="54" y="237" fill="#ec4899" fontSize="7.5" fontFamily="monospace">  uni: &apos;UOL&apos;,</text>
+        <text x="54" y="249" fill="rgba(0,229,255,0.55)" fontSize="7.5" fontFamily="monospace">&#125;</text>
+        <rect x="28" y="262" width="144" height="8" rx="4" fill="#0c0c26" stroke="rgba(0,229,255,0.25)" strokeWidth="1" />
         <defs>
-          <linearGradient id="bodyGrad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.15" />
+          <linearGradient id="bGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.12" />
+            <stop offset="100%" stopColor="#7c3aed" stopOpacity="0.12" />
           </linearGradient>
-          <linearGradient id="screenGrad" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="sGrad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#00e5ff" />
             <stop offset="100%" stopColor="#7c3aed" />
           </linearGradient>
@@ -239,8 +166,8 @@ function DevCharacter() {
   );
 }
 
-/* ── Typing animation ────────────────────────────────────────── */
-const roles = [
+/* ─── Typing text ──────────────────────────────────────────── */
+const ROLES = [
   "Full-Stack Web Developer",
   "React & Next.js Engineer",
   "Node.js Backend Developer",
@@ -248,270 +175,158 @@ const roles = [
 ];
 
 function TypingText() {
-  const [index, setIndex]   = useState(0);
-  const [text, setText]     = useState("");
-  const [deleting, setDeleting] = useState(false);
+  const [idx, setIdx]     = useState(0);
+  const [text, setText]   = useState("");
+  const [del, setDel]     = useState(false);
 
   useEffect(() => {
-    const current = roles[index];
-    const timeout = setTimeout(() => {
-      if (!deleting) {
-        setText(current.slice(0, text.length + 1));
-        if (text.length + 1 === current.length) {
-          setTimeout(() => setDeleting(true), 1500);
-        }
+    const cur = ROLES[idx];
+    const t = setTimeout(() => {
+      if (!del) {
+        const next = cur.slice(0, text.length + 1);
+        setText(next);
+        if (next === cur) setTimeout(() => setDel(true), 1600);
       } else {
-        setText(current.slice(0, text.length - 1));
-        if (text.length === 0) {
-          setDeleting(false);
-          setIndex((i) => (i + 1) % roles.length);
-        }
+        const next = cur.slice(0, text.length - 1);
+        setText(next);
+        if (next === "") { setDel(false); setIdx((i) => (i + 1) % ROLES.length); }
       }
-    }, deleting ? 40 : 80);
-    return () => clearTimeout(timeout);
-  }, [text, deleting, index]);
+    }, del ? 38 : 76);
+    return () => clearTimeout(t);
+  }, [text, del, idx]);
 
   return (
-    <span style={{ color: "#00e5ff", fontWeight: 700 }}>
-      {text}
-      <span
-        style={{
-          borderRight: "2px solid #00e5ff",
-          marginLeft: 2,
-          animation: "blink 0.8s step-end infinite",
-        }}
-      />
+    <span style={{ color: "var(--clr-cyan)", fontWeight: 700 }}>
+      {text}<span className="cursor" />
     </span>
   );
 }
 
-/* ── Main Hero ───────────────────────────────────────────────── */
+/* ─── Hero ─────────────────────────────────────────────────── */
 export default function Hero() {
   return (
-    <section
-      id="home"
-      style={{
-        minHeight: "100vh",
-        position: "relative",
-        display: "flex",
-        alignItems: "center",
-        overflow: "hidden",
-        paddingTop: 80,
-        background:
-          "radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.12) 0%, transparent 60%)," +
-          "radial-gradient(ellipse at 80% 20%, rgba(0,229,255,0.1) 0%, transparent 60%)",
-      }}
-    >
-      <ParticleCanvas />
+    <section className="hero-section bg-hero">
+      <Particles />
 
-      <div className="max-w-7xl mx-auto px-6 py-20 w-full grid lg:grid-cols-2 gap-16 items-center relative z-10">
-        {/* ── LEFT: text ─────────────────────────────────────── */}
-        <div style={{ animation: "fadeInUp 0.9s ease forwards" }}>
-          {/* Badge */}
-          <div
-            className="inline-flex items-center gap-2 mb-6 px-4 py-2 rounded-full text-sm font-medium"
-            style={{
-              background: "rgba(0,229,255,0.08)",
-              border: "1px solid rgba(0,229,255,0.3)",
-              color: "#00e5ff",
-            }}
-          >
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Available for work · Lahore, Pakistan 🇵🇰
-          </div>
+      <div className="container" style={{ position: "relative", zIndex: 1, paddingBlock: "2rem" }}>
+        <div className="hero-grid">
 
-          <h1
-            style={{
-              fontSize: "clamp(2.4rem, 6vw, 4.5rem)",
-              fontWeight: 900,
-              lineHeight: 1.1,
-              letterSpacing: "-0.03em",
-              marginBottom: "1rem",
-            }}
-          >
-            Hi, I&apos;m{" "}
-            <span className="gradient-text">Wahad Ahmed</span>
-          </h1>
+          {/* LEFT */}
+          <div className="anim-fadeup">
+            <div className="hero-badge">
+              <span className="dot-pulse" />
+              Available for work · Lahore, Pakistan 🇵🇰
+            </div>
 
-          <div
-            style={{
-              fontSize: "clamp(1.1rem, 2.5vw, 1.5rem)",
-              marginBottom: "1.5rem",
-              minHeight: "2.2rem",
-            }}
-          >
-            <TypingText />
-          </div>
+            <h1 className="hero-title">
+              Hi, I&apos;m{" "}
+              <span className="gradient-text">Wahad Ahmed</span>
+            </h1>
 
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "1.05rem",
-              lineHeight: 1.75,
-              maxWidth: 520,
-              marginBottom: "2.5rem",
-            }}
-          >
-            Crafting fast, scalable, and production-ready web applications with
-            modern technologies. Currently studying at{" "}
-            <span style={{ color: "#00e5ff" }}>University of Lahore (UOL)</span> and
-            shipping things I&apos;m proud of.
-          </p>
+            <div className="hero-role">
+              <TypingText />
+            </div>
 
-          {/* Buttons */}
-          <div className="flex flex-wrap gap-4 mb-8">
-            <Link href="/projects" className="btn-primary inline-flex items-center gap-2 px-7 py-3 text-base">
-              View Projects <ArrowRight size={18} />
-            </Link>
-            <a
-              href="/#contact"
-              className="btn-outline inline-flex items-center gap-2 px-7 py-3 text-base"
-            >
-              <Download size={18} /> Download CV
-            </a>
-          </div>
+            <p className="hero-desc">
+              Crafting fast, scalable, and production-ready web applications
+              with modern technologies. Studying at{" "}
+              <span className="text-cyan" style={{ fontWeight: 600 }}>
+                University of Lahore (UOL)
+              </span>{" "}
+              and shipping things I&apos;m proud of.
+            </p>
 
-          {/* Social links */}
-          <div className="flex items-center gap-5">
-            <span style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-              Find me on
-            </span>
-            {[
-              { href: "https://github.com/wahad-ahmed",   Icon: Github,   label: "GitHub"   },
-              { href: "https://linkedin.com/in/wahad-ahmed", Icon: Linkedin, label: "LinkedIn" },
-              { href: "https://twitter.com/wahad_ahmed",  Icon: Twitter,  label: "Twitter"  },
-            ].map(({ href, Icon, label }) => (
-              <a
-                key={label}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(0,229,255,0.2)",
-                  color: "var(--text-secondary)",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background =
-                    "rgba(0,229,255,0.15)";
-                  (e.currentTarget as HTMLElement).style.color = "#00e5ff";
-                  (e.currentTarget as HTMLElement).style.borderColor =
-                    "rgba(0,229,255,0.6)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-3px)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background =
-                    "rgba(255,255,255,0.05)";
-                  (e.currentTarget as HTMLElement).style.color =
-                    "var(--text-secondary)";
-                  (e.currentTarget as HTMLElement).style.borderColor =
-                    "rgba(0,229,255,0.2)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                }}
-              >
-                <Icon size={18} />
+            <div className="hero-actions">
+              <Link href="/projects" className="btn btn-primary btn-lg">
+                View Projects <ArrowRight size={18} />
+              </Link>
+              <a href="/#contact" className="btn btn-outline btn-lg">
+                <FileText size={18} /> Download CV
               </a>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* ── RIGHT: animated character + orbits ──────────── */}
-        <div
-          className="flex items-center justify-center"
-          style={{
-            position: "relative",
-            height: 620,
-            animation: "fadeInUp 1.1s ease 0.2s both",
-          }}
-        >
-          {/* Orbit rings (decorative) */}
-          {[170, 215, 260].map((r, i) => (
-            <div
-              key={r}
-              style={{
-                position: "absolute",
-                width: r * 2,
-                height: r * 2,
-                borderRadius: "50%",
-                border: `1px solid rgba(0,229,255,${0.07 + i * 0.04})`,
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%,-50%)",
-                animation: i % 2 === 0
-                  ? `rotate-slow ${22 + i * 5}s linear infinite`
-                  : `rotate-reverse ${18 + i * 5}s linear infinite`,
-              }}
-            />
-          ))}
-
-          {/* Orbiting icons */}
-          {orbitItems.map((item, i) => (
-            <OrbitItem key={item.label} {...item} index={i} />
-          ))}
-
-          {/* Character */}
-          <div style={{ position: "relative", zIndex: 2 }}>
-            <DevCharacter />
+            <div className="hero-socials">
+              <span style={{ fontSize: "0.8rem", color: "var(--clr-muted)" }}>Find me on</span>
+              {[
+                { href: "https://github.com/wahad-ahmed",      Icon: Github,   label: "GitHub"   },
+                { href: "https://linkedin.com/in/wahad-ahmed", Icon: Linkedin, label: "LinkedIn" },
+                { href: "https://twitter.com/wahad_ahmed",     Icon: Twitter,  label: "Twitter"  },
+              ].map(({ href, Icon, label }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="hero-social-btn"
+                >
+                  <Icon size={17} />
+                </a>
+              ))}
+            </div>
           </div>
 
-          {/* Glow behind character */}
+          {/* RIGHT — orbit stage */}
           <div
-            style={{
-              position: "absolute",
-              width: 280,
-              height: 280,
-              borderRadius: "50%",
-              background:
-                "radial-gradient(ellipse, rgba(0,229,255,0.15) 0%, transparent 70%)",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-              filter: "blur(20px)",
-              zIndex: 1,
-            }}
-          />
+            className="anim-fadeup"
+            style={{ animationDelay: "0.18s", display: "flex", justifyContent: "center" }}
+          >
+            <div className="orbit-stage">
+              {/* Decorative rings */}
+              {([
+                { r: 36, dur: 24, dir: "anim-spin-cw",  op: 0.10 },
+                { r: 46, dur: 18, dir: "anim-spin-ccw", op: 0.08 },
+                { r: 56, dur: 30, dir: "anim-spin-cw",  op: 0.06 },
+              ] as { r: number; dur: number; dir: string; op: number }[]).map(({ r, dir, op }, i) => (
+                <div
+                  key={i}
+                  className={`orbit-ring ${dir}`}
+                  style={{
+                    width: `${r * 2}%`, height: `${r * 2}%`,
+                    border: `1px solid rgba(0,229,255,${op})`,
+                    transform: "translate(-50%,-50%)",
+                  }}
+                />
+              ))}
+
+              {/* Background glow */}
+              <div
+                className="orbit-glow"
+                style={{ width: "55%", height: "55%" }}
+              />
+
+              {/* Orbiting tech icons */}
+              {orbitItems.map((item) => {
+                /* scale radius as % of stage width so it's truly responsive */
+                const rPct = item.radius / 580 * 100;
+                return (
+                  <OrbitIcon
+                    key={item.label}
+                    icon={item.icon}
+                    label={item.label}
+                    size={item.size}
+                    radius={item.radius}
+                    speed={item.speed}
+                    delay={item.delay}
+                  />
+                );
+                void rPct;
+              })}
+
+              {/* Character */}
+              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 2, width: "42%" }}>
+                <DevChar />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 32,
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 8,
-          color: "var(--text-secondary)",
-          fontSize: "0.75rem",
-          animation: "fadeInUp 1.5s ease 1s both",
-        }}
-      >
-        <span>Scroll down</span>
-        <div
-          style={{
-            width: 24,
-            height: 38,
-            border: "2px solid rgba(0,229,255,0.4)",
-            borderRadius: 12,
-            display: "flex",
-            justifyContent: "center",
-            paddingTop: 6,
-          }}
-        >
-          <div
-            style={{
-              width: 4,
-              height: 8,
-              background: "#00e5ff",
-              borderRadius: 2,
-              animation: "float 1.5s ease-in-out infinite",
-            }}
-          />
+      {/* Scroll cue */}
+      <div className="scroll-cue">
+        <span>Scroll</span>
+        <div className="scroll-mouse">
+          <div className="scroll-dot" />
         </div>
       </div>
     </section>

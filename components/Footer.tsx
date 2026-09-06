@@ -2,64 +2,63 @@ import { personal } from "@/lib/data";
 import { Github, Linkedin, Twitter, Heart, Code2 } from "lucide-react";
 import Link from "next/link";
 
+const NAV = [
+  { label: "Home",     href: "/"         },
+  { label: "About",    href: "/#about"   },
+  { label: "Skills",   href: "/#skills"  },
+  { label: "Projects", href: "/projects" },
+  { label: "Contact",  href: "/#contact" },
+];
+
+const SOCIAL = [
+  { Icon: Github,   label: "GitHub",   href: personal.github   },
+  { Icon: Linkedin, label: "LinkedIn", href: personal.linkedin },
+  { Icon: Twitter,  label: "Twitter",  href: personal.twitter  },
+];
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer
-      style={{
-        borderTop: "1px solid rgba(0,229,255,0.1)",
-        padding: "48px 0 24px",
-        position: "relative",
-      }}
-    >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid md:grid-cols-3 gap-10 mb-10">
+    <footer style={{
+      borderTop: "1px solid rgba(0,229,255,0.10)",
+      paddingTop: "3.5rem",
+      paddingBottom: "1.75rem",
+      background: "var(--clr-bg)",
+    }}>
+      <div className="container">
+        <div className="footer-grid">
+
           {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-3">
-              <div
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 8,
-                  background: "linear-gradient(135deg,#00e5ff,#7c3aed)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Code2 size={18} className="text-white" />
+            <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", marginBottom: "1rem" }}>
+              <div style={{
+                width: 34, height: 34, borderRadius: 8,
+                background: "linear-gradient(135deg, var(--clr-cyan), var(--clr-purple))",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <Code2 size={17} style={{ color: "#fff" }} />
               </div>
-              <span className="font-extrabold text-lg">
-                <span style={{ color: "#00e5ff" }}>Wahad</span>
-                <span className="text-white">.dev</span>
+              <span style={{ fontWeight: 800, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>
+                <span style={{ color: "var(--clr-cyan)" }}>Wahad</span>
+                <span style={{ color: "var(--clr-text)" }}>.dev</span>
               </span>
             </Link>
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.88rem", lineHeight: 1.7, maxWidth: 260 }}>
-              Full-stack web developer from Lahore, Pakistan. Building modern experiences one component at a time.
+            <p style={{ color: "var(--clr-muted)", fontSize: "var(--text-sm)", lineHeight: 1.75, maxWidth: 260 }}>
+              Full-stack web developer from Lahore, Pakistan.
+              Building modern web experiences one component at a time.
             </p>
           </div>
 
           {/* Quick links */}
           <div>
-            <p style={{ fontWeight: 700, marginBottom: 16, color: "#00e5ff" }}>
+            <p style={{ fontWeight: 700, fontSize: "var(--text-sm)", color: "var(--clr-cyan)", marginBottom: "1.1rem", letterSpacing: "0.04em" }}>
               Quick Links
             </p>
-            <ul className="flex flex-col gap-3">
-              {[
-                { label: "Home",     href: "/"         },
-                { label: "About",    href: "/#about"   },
-                { label: "Skills",   href: "/#skills"  },
-                { label: "Projects", href: "/projects" },
-                { label: "Contact",  href: "/#contact" },
-              ].map(({ label, href }) => (
+            <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+              {NAV.map(({ label, href }) => (
                 <li key={label}>
-                  <Link
-                    href={href}
-                    className="nav-link text-sm"
-                    style={{ color: "var(--text-secondary)" }}
-                  >
+                  <Link href={href} className="nav-link" style={{ fontSize: "var(--text-sm)" }}>
                     {label}
                   </Link>
                 </li>
@@ -69,24 +68,20 @@ export default function Footer() {
 
           {/* Connect */}
           <div>
-            <p style={{ fontWeight: 700, marginBottom: 16, color: "#00e5ff" }}>
+            <p style={{ fontWeight: 700, fontSize: "var(--text-sm)", color: "var(--clr-cyan)", marginBottom: "1.1rem", letterSpacing: "0.04em" }}>
               Connect
             </p>
-            <div className="flex flex-col gap-3">
-              {[
-                { Icon: Github,   label: "GitHub",   href: personal.github   },
-                { Icon: Linkedin, label: "LinkedIn", href: personal.linkedin },
-                { Icon: Twitter,  label: "Twitter",  href: personal.twitter  },
-              ].map(({ Icon, label, href }) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
+              {SOCIAL.map(({ Icon, label, href }) => (
                 <a
                   key={label}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 nav-link text-sm"
-                  style={{ color: "var(--text-secondary)" }}
+                  className="nav-link"
+                  style={{ display: "inline-flex", alignItems: "center", gap: "0.45rem", fontSize: "var(--text-sm)" }}
                 >
-                  <Icon size={15} /> {label}
+                  <Icon size={14} /> {label}
                 </a>
               ))}
             </div>
@@ -94,31 +89,21 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div
-          style={{
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-            paddingTop: 20,
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-          }}
-        >
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.82rem" }}>
+        <div style={{
+          borderTop: "1px solid rgba(255,255,255,0.06)",
+          paddingTop: "1.5rem",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: "0.75rem",
+        }}>
+          <p style={{ color: "var(--clr-muted)", fontSize: "var(--text-xs)" }}>
             © {year} Wahad Ahmed · All rights reserved.
           </p>
-          <p
-            style={{
-              color: "var(--text-secondary)",
-              fontSize: "0.82rem",
-              display: "flex",
-              alignItems: "center",
-              gap: 4,
-            }}
-          >
-            Made with <Heart size={13} style={{ color: "#ec4899" }} /> in{" "}
-            <span style={{ color: "#00e5ff" }}>Lahore, Pakistan 🇵🇰</span>
+          <p style={{ color: "var(--clr-muted)", fontSize: "var(--text-xs)", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+            Made with <Heart size={12} style={{ color: "var(--clr-pink)" }} /> in{" "}
+            <span style={{ color: "var(--clr-cyan)" }}>Lahore, Pakistan 🇵🇰</span>
           </p>
         </div>
       </div>

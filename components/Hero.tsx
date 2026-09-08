@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { orbitItems } from "@/lib/data";
+import { orbitItems, personal } from "@/lib/data";
 import { Github, Linkedin, Twitter, ArrowRight, FileText } from "lucide-react";
 import Link from "next/link";
 
@@ -248,9 +248,9 @@ export default function Hero() {
             <div className="hero-socials">
               <span style={{ fontSize: "0.8rem", color: "var(--clr-muted)" }}>Find me on</span>
               {[
-                { href: "https://github.com/wahad-ahmed",      Icon: Github,   label: "GitHub"   },
-                { href: "https://linkedin.com/in/wahad-ahmed", Icon: Linkedin, label: "LinkedIn" },
-                { href: "https://twitter.com/wahad_ahmed",     Icon: Twitter,  label: "Twitter"  },
+                { href: personal.github,   Icon: Github,   label: "GitHub"   },
+                { href: personal.linkedin, Icon: Linkedin, label: "LinkedIn" },
+                { href: personal.twitter,  Icon: Twitter,  label: "Twitter"  },
               ].map(({ href, Icon, label }) => (
                 <a
                   key={label}

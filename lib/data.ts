@@ -97,6 +97,18 @@ export const projects = [
     category: "AI / Full Stack",
     color: "#6366f1",
   },
+  {
+    id: 7,
+    title: "UOLRank",
+    description:
+      "A student platform for University of Lahore students to find teachers, read anonymous reviews, and share ratings. Uses Supabase for authentication and data management.",
+    tech: ["Next.js", "TypeScript", "Supabase", "Vercel"],
+    github: "https://github.com/abidi1abbas/uolrank",
+    live: "https://uolrank.vercel.app/",
+    featured: true,
+    category: "Full Stack",
+    color: "#10b981",
+  },
 ];
 
 export const orbitItems = [

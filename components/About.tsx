@@ -92,6 +92,7 @@ export default function About() {
 
             <div style={{ display:"flex", flexWrap:"wrap", gap:"0.875rem" }}>
               <a href="/#contact" className="btn btn-primary">Get in Touch</a>
+              <a href="/resume.pdf" download="Wahad-Ahmed-Resume.pdf" className="btn btn-outline">Download Resume</a>
               <a href={personal.github} target="_blank" rel="noopener noreferrer" className="btn btn-outline">GitHub Profile</a>
             </div>
           </div>

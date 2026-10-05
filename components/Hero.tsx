@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { orbitItems, personal } from "@/lib/data";
-import { Github, Linkedin, Twitter, ArrowRight, Mail } from "lucide-react";
+import { Github, Linkedin, Twitter, ArrowRight, Mail, Download } from "lucide-react";
 import Link from "next/link";
 
 /* ── Particles ─────────────────────────────────────── */
@@ -188,6 +188,9 @@ export default function Hero() {
                 <Link href="/projects" className="btn btn-primary btn-lg" style={{ boxShadow:"0 0 28px rgba(0,229,255,0.22), 0 0 55px rgba(124,58,237,0.14)" }}>
                   View Projects <ArrowRight size={17} />
                 </Link>
+                <a href="/resume.pdf" download="Wahad-Ahmed-Resume.pdf" className="btn btn-outline btn-lg">
+                  <Download size={17} /> Download Resume
+                </a>
                 <a href="/#contact" className="btn btn-outline btn-lg">
                   <Mail size={17} /> Hire Me
                 </a>

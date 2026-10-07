@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
             </div>
             <p style="color: #94a3b8; font-size: 14px; line-height: 1.7;">
               In the meantime, feel free to check out my work on 
-              <a href="https://github.com/wahad-ahmed" style="color: #00e5ff;">GitHub</a> or 
+              <a href="https://github.com/mwa902" style="color: #00e5ff;">GitHub</a> or 
               connect on <a href="https://linkedin.com/in/wahad-ahmed" style="color: #00e5ff;">LinkedIn</a>.
             </p>
             <p style="color: #f0f0f0; font-size: 15px; margin-top: 24px;">

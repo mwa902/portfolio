@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { personal } from "@/lib/data";
-import { Mail, Phone, MapPin, Github, Linkedin, Twitter, Send, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Github, Linkedin, Instagram, Send, CheckCircle, AlertCircle } from "lucide-react";
 
 function useReveal(delay = 0) {
   const ref = useRef<HTMLDivElement>(null);
@@ -22,7 +22,7 @@ type Status = "idle" | "sending" | "success" | "error";
 const SOCIALS = [
   { Icon: Github,   label:"GitHub",   href: personal.github,   hc:"#e2e8f0" },
   { Icon: Linkedin, label:"LinkedIn", href: personal.linkedin, hc:"#0a66c2" },
-  { Icon: Twitter,  label:"Twitter",  href: personal.twitter,  hc:"#1d9bf0" },
+  { Icon: Instagram, label:"Instagram", href: personal.instagram, hc:"#e4405f" },
 ];
 
 export default function Contact() {

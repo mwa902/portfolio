@@ -8,7 +8,7 @@ export const personal = {
   bio: "I'm a passionate full-stack web developer from Lahore, Pakistan, currently studying at the University of Lahore (UOL). I build fast, scalable, and production-ready web applications using React, Next.js, Node.js, and more. I love turning complex ideas into clean, maintainable code.",
   github: "https://github.com/mwa902",
   linkedin: "https://pk.linkedin.com/in/wahad-ahmed-916696294?trk=people-guest_people_search-card",
-  twitter: "https://twitter.com/wahad_ahmed",
+  instagram: "https://www.instagram.com/wwahaaaad",
 };
 
 export const skills = [

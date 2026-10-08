@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { orbitItems, personal } from "@/lib/data";
-import { Github, Linkedin, Twitter, ArrowRight, Mail, Download } from "lucide-react";
+import { Github, Linkedin, Instagram, ArrowRight, Mail, Download } from "lucide-react";
 import Link from "next/link";
 
 /* ── Particles ─────────────────────────────────────── */
@@ -204,7 +204,7 @@ export default function Hero() {
               {[
                 { href: personal.github,   Icon: Github,   label: "GitHub"   },
                 { href: personal.linkedin, Icon: Linkedin, label: "LinkedIn" },
-                { href: personal.twitter,  Icon: Twitter,  label: "Twitter"  },
+                { href: personal.instagram, Icon: Instagram, label: "Instagram" },
               ].map(({ href, Icon, label }) => (
                 <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                   aria-label={label} className="hero-social-btn">

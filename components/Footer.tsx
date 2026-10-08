@@ -1,5 +1,5 @@
 import { personal } from "@/lib/data";
-import { Github, Linkedin, Twitter, Heart, Code2 } from "lucide-react";
+import { Github, Linkedin, Instagram, Heart, Code2 } from "lucide-react";
 import Link from "next/link";
 
 const NAV = [
@@ -12,7 +12,7 @@ const NAV = [
 const SOCIAL = [
   { Icon:Github,   label:"GitHub",   href:personal.github   },
   { Icon:Linkedin, label:"LinkedIn", href:personal.linkedin },
-  { Icon:Twitter,  label:"Twitter",  href:personal.twitter  },
+  { Icon:Instagram, label:"Instagram", href:personal.instagram },
 ];
 
 export default function Footer() {

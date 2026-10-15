@@ -109,6 +109,18 @@ export const projects = [
     category: "Full Stack",
     color: "#10b981",
   },
+  {
+    id: 8,
+    title: "Learning Management System",
+    description:
+      "A learning management platform with student registration, course and assignment workflows, submissions, fee management, and an admin dashboard.",
+    tech: ["HTML", "CSS", "JavaScript", "SQL"],
+    github: "https://github.com/mwa902/Learning-Management-system-",
+    live: "https://learning-management-system-9scn.vercel.app/Signup/signup.html",
+    featured: true,
+    category: "Full Stack",
+    color: "#f59e0b",
+  },
 ];
 
 export const orbitItems = [
